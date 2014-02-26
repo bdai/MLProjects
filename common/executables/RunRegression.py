@@ -2,9 +2,10 @@
 '''
 executable file to run regression
 '''
+from Regression import StreamRegression
+
 import argparse
 import numpy as np
-import StreamRegression
 import sys
 import time
 
@@ -60,7 +61,7 @@ def Fit (file_name, method, res_array, ridge, total):
     file_reader = FileParser(file_name)
     ## read header
     names = file_reader.ReadLine()
-    if not (total is None):
+    if not total:
         total = int(1000)
     for count in range(total):
         sample = file_reader.ReadLine(True)
@@ -72,9 +73,9 @@ if __name__ == "__main__":
     parser.add_argument("data", help = "the csv format data file name for regression")
     parser.add_argument("type", help = "type of the regression, only stream supported",
                         default = "stream")
-    parser.add_argument("--total", help = "number of samples to be used for regression, default None", default = None)
+    parser.add_argument("--total", help = "number of samples to be used for regression, default None", default = 0, type = int)
     parser.add_argument("--lam", help = "penalty of ridge regression", default = '0.0001')
-    parser.add_argument("--responses", '-r', help = "columns to be used for regression", nargs = '+', default = 1, type = int)
+    parser.add_argument("--responses", '-r', help = "columns to be used for regression", nargs = '+', default = [1], type = int)
     args = parser.parse_args()
     try:
         Fit(args.data, args.type, args.responses, args.lam, args.total)
