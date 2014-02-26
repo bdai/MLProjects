@@ -37,6 +37,12 @@ class StreamRegression:
         self.coef = np.linalg.solve(self.mXX, self.mXY)
         return self.coef
     
+    def SetCoef (self, coef):
+        '''
+        coefficients feeded from outside
+        '''
+        self.coef = coef
+    
     def Predict (self, observation):
         '''
         prediction on future values

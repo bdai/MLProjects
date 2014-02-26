@@ -5,6 +5,7 @@ executable file to run regression
 from Regression import StreamRegression
 
 import argparse
+import cPickle
 import numpy as np
 import sys
 import time
@@ -44,7 +45,7 @@ class FileParser:
         else:
             return line.split(self.sep)
 
-def Fit (file_name, method, res_array, ridge, total):
+def Fit (file_name, method, res_array, ridge, total, frequency, pickle_file):
     '''
     main process of fitting the regression model
 
@@ -63,10 +64,23 @@ def Fit (file_name, method, res_array, ridge, total):
     names = file_reader.ReadLine()
     if not total:
         total = int(1000)
+    if len(names) - len(res_array) > total:
+        print "WARNING: n < p problem!"
+    regression = StreamRegression.StreamRegression(len(names) - len(res_array), len(res_array), ridge)
     for count in range(total):
+        if count % frequency == 0:
+            print "Training iteration: {}".format(count)
         sample = file_reader.ReadLine(True)
-        print sample
+        response = [sample[item] for item in res_array]
+        variable = [i for j, i in enumerate(sample) if j not in res_array]
+        regression.Update(np.array(variable, dtype = np.float), np.array(response, dtype = np.float))
 
+    if pickle_file:
+        output_file = open(pickle_file, 'w')
+        cPickle.dump(regression.GetCoef(), output_file)
+        output_file.close()
+    else:
+        print regression.GetCoef()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -76,8 +90,7 @@ if __name__ == "__main__":
     parser.add_argument("--total", help = "number of samples to be used for regression, default None", default = 0, type = int)
     parser.add_argument("--lam", help = "penalty of ridge regression", default = '0.0001')
     parser.add_argument("--responses", '-r', help = "columns to be used for regression", nargs = '+', default = [1], type = int)
+    parser.add_argument("--freq", help = "print for every this many iterations, default 100", type = int, default = 100)
+    parser.add_argument("--pickle", help = "pickle file name to store resulting coef", default = None)
     args = parser.parse_args()
-    try:
-        Fit(args.data, args.type, args.responses, args.lam, args.total)
-    except:
-        print time.ctime(), "fitting error occured, code {}".format(sys.exc_info()[0])
+    Fit(args.data, args.type, args.responses, args.lam, args.total, args.freq, args.pickle)
