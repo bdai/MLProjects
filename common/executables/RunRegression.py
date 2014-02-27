@@ -66,7 +66,7 @@ def Fit (file_name, method, res_array, ridge, total, frequency, pickle_file):
         total = int(1000)
     if len(names) - len(res_array) > total:
         print "WARNING: n < p problem!"
-    regression = StreamRegression.StreamRegression(len(names) - len(res_array), len(res_array), ridge)
+    regression = StreamRegression.StreamRegression(len(names) - len(res_array), len(res_array), [float(item) for item in ridge])
     for count in range(total):
         if count % frequency == 0:
             print "Training iteration: {}".format(count)
@@ -88,9 +88,9 @@ if __name__ == "__main__":
     parser.add_argument("type", help = "type of the regression, only stream supported",
                         default = "stream")
     parser.add_argument("--total", help = "number of samples to be used for regression, default None", default = 0, type = int)
-    parser.add_argument("--lam", help = "penalty of ridge regression", default = '0.0001')
+    parser.add_argument("--lam", help = "penalty of ridge regression, default 0", default = '0', nargs = '+')
     parser.add_argument("--responses", '-r', help = "columns to be used for regression", nargs = '+', default = [1], type = int)
     parser.add_argument("--freq", help = "print for every this many iterations, default 100", type = int, default = 100)
     parser.add_argument("--pickle", help = "pickle file name to store resulting coef", default = None)
     args = parser.parse_args()
-    Fit(args.data, args.type, args.responses, args.lam, args.total, args.freq, args.pickle)
+    Fit(args.data, args.type, args.responses, float(args.lam), args.total, args.freq, args.pickle)
