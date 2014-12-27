@@ -5,7 +5,7 @@ import numpy as np
 
 class StreamRegression:
     '''
-    class that update observations and get online estimate
+    class that update observations and get online estimate (Note: assume all inputs are centered)
     '''
     def __init__ (self, dim, y_dim = 1, lam = [0]):
         '''
