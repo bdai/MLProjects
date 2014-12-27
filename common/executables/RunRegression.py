@@ -25,6 +25,7 @@ def SKFit (file_name, res_array, ridge, total, pickle_file):
     '''
     from sklearn.linear_model import Ridge
 
+<<<<<<< HEAD
     if not total:
         total = int(1000)
     ridge_obj = [Ridge(alpha = float(item)) for item in ridge]
@@ -53,6 +54,19 @@ def SKFit (file_name, res_array, ridge, total, pickle_file):
 def StreamFit (file_name, res_array, ridge, total, frequency, pickle_file):
     '''
     fit regression model with streaming
+=======
+        line = self.csv_file.readline().strip()
+        if len(line) == 0:
+            return None
+        if convert:
+            return [float(item) for item in line.split(self.sep)]
+        else:
+            return line.split(self.sep)
+    
+def SKFit (file_name, res_array, ridge, total, pickle_file):
+    '''
+    fit regression model with sklearn
+>>>>>>> f6095766a051695b21bccc095eab0479b80504cc
 
     Parameters:
     --------------------------------------------
@@ -62,6 +76,46 @@ def StreamFit (file_name, res_array, ridge, total, frequency, pickle_file):
     total:       number of points to use
     frequency:   printing frequncy
     pickle_file: name of the file to store resutling coefficient
+<<<<<<< HEAD
+=======
+    '''
+    from sklearn.linear_model import Ridge
+
+    if not total:
+        total = int(1000)
+    ridge_obj = [Ridge(alpha = float(item)) for item in ridge]
+    ### numpy array has size problem, using pandas may slow things down
+    ## full_mat = np.genfromtxt(file_name, dtype = float, delimiter = ',', names = True)
+    from pandas import read_csv
+    full_mat = read_csv(file_name, delimiter = ',', nrows = total).values
+    response = full_mat[:, res_array]
+    var_list = [i for i in range(full_mat.shape[1]) if i not in res_array]
+    variable = full_mat[:, var_list]
+    res_list = [Ridge(alpha = float(item)) for item in ridge]
+    for item in res_list:
+        item.fit(variable, response)
+    res_list = [item.coef_.T for item in res_list]
+    
+    if pickle_file:
+        output_file = open(pickle_file, 'w')
+        cPickle.dump(res_list, output_file)
+        output_file.close()
+    else:
+        print res_list
+
+def StreamFit (file_name, res_array, ridge, total, frequency, pickle_file):
+    '''
+    fit regression model with streaming
+
+    Parameters:
+    --------------------------------------------
+    file_name:   input file name
+    res_array:   array of responses to be fitted
+    ridge:       penalty to be taken in ridge regression
+    total:       number of points to use
+    frequency:   printing frequncy
+    pickle_file: name of the file to store resutling coefficient
+>>>>>>> f6095766a051695b21bccc095eab0479b80504cc
     '''
     from Regression import StreamRegression
 
